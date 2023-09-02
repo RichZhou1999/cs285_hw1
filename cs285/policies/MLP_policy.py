@@ -130,9 +130,10 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
         # return more flexible objects, such as a
         # `torch.distributions.Distribution` object. It's up to you!
         mean = self.mean_net(observation)
-        normal_dist = distributions.Normal(mean, self.logstd.exp())
-        sample = normal_dist.sample((1,))
+        normal_dist = distributions.Normal(mean, torch.exp(self.logstd))
+        sample = normal_dist.rsample((1,))
         return sample
+        # return mean
 
     def update(self, observations, actions):
         """
@@ -147,10 +148,12 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
         optimizer = torch.optim.Adam(self.parameters())
         optimizer.zero_grad()
         observations = ptu.from_numpy(np.array(observations))
-        observations.requires_grad_()
+        # observations.requires_grad_()
         actions = ptu.from_numpy(np.array(actions))
-        actions.requires_grad_()
+        # actions.requires_grad_()
         predictions = self.forward(observations)[0]
+        # print(predictions.shape)
+        # predictions = self.forward(observations)
         loss = F.mse_loss(predictions, actions)
         loss.backward()
         optimizer.step()

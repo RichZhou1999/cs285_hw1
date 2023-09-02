@@ -43,9 +43,9 @@ def sample_trajectory(env, policy, max_path_length, render=False):
         # TODO rollout can end due to done, or due to max_path_length
         steps += 1
         if done or steps >= max_path_length:
-            rollout_done = True # HINT: this is either 0 or 1
+            rollout_done = 1 # HINT: this is either 0 or 1
         else:
-            rollout_done = False
+            rollout_done = 0
         
         # record result of taking that action
         obs.append(ob)
